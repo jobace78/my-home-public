@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+
+### BASH BASE [V2] BEGIN ###
+
+if [ -n "${BASH_VERSINFO[*]}" ]; then
+  if [ "${BASH_VERSINFO[0]}" -ge 4 ] && [ "${BASH_VERSINFO[1]}" -ge 4 ]; then
+    :
+  elif [ "${BASH_VERSINFO[0]}" -ge 5 ]; then
+    :
+  else
+    exit 1
+  fi
+else
+  exit 1
+fi
+
+if [ "${SCRIPT_DEBUG}" = 'true' ]; then
+  echo 'Script debugging is enabled, allowing bash commands and their arguments to be printed as they are executed.'
+  set -x
+fi
+
+# Notes:
+#   - https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
+#   - https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html
+#   - https://en.wikipedia.org/wiki/Umask
+#
+BASH_COMPAT=44
+export BASH_COMPAT
+set -e -o pipefail
+shopt -s dotglob extglob
+umask "${UMASK:-0007}"
+
+### BASH BASE [V2] END ###
+
+case "$(uname)" in
+  Darwin*)
+    ;;
+  *)
+    echo 'Sorry, only macOS is supported at this moment...'
+    exit 1
+    ;;
+esac
+
+# Notes:
+#   - https://github.com/romkatv/powerlevel10k
+#
+
+# shellcheck source=functions.conf
+. "$(dirname "${0}")"/functions.conf
+
+# _download_and_install
+# _help
+
+_download_and_install() {
+  git clone --depth 1 https://github.com/romkatv/powerlevel10k.git --quiet "${HOME:?}"/.powerlevel10k
+  pushd "${HOME:?}"/.powerlevel10k
+  # shellcheck disable=SC2038
+  find config -name "*.zsh" -type f 2> /dev/null \
+  | xargs sed -i '' 's/branch > 32/branch > 64/g'
+  git gc --quiet
+  popd
+}
+
+_help() {
+  local exit_code
+  exit_code="${1:-1}"
+  cat << EOT
+
+  Usage: $(basename "${0}") [OPTION...]
+
+  Help options:
+    -H Show this help message
+    -U Display brief usage
+    -V Print version
+
+EOT
+  exit "${exit_code}"
+}
+
+trap '_catch_all ${?}' ERR SIGHUP SIGINT SIGQUIT SIGTERM
+
+if [ -d "${HOME:?}"/.powerlevel10k ]; then
+  if [ "${1}" = "-f" ]; then
+    rm -f -r -v "${HOME:?}"/.powerlevel10k
+    _download_and_install
+  fi
+else
+  _download_and_install
+fi
+
+_exit 0

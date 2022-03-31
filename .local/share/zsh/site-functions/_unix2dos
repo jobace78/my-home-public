@@ -1,0 +1,10 @@
+#compdef _unix2dos unix2dos
+
+function _unix2dos {
+  local line
+  _arguments -C \
+  "-H[Show this help message]" \
+  "-U[Display brief usage]" \
+  "-V[Print version]" \
+  "*:file:_files"
+}

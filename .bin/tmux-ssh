@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+### BASH BASE [V2] BEGIN ###
+
+if [ -n "${BASH_VERSINFO[*]}" ]; then
+  if [ "${BASH_VERSINFO[0]}" -ge 4 ] && [ "${BASH_VERSINFO[1]}" -ge 4 ]; then
+    :
+  elif [ "${BASH_VERSINFO[0]}" -ge 5 ]; then
+    :
+  else
+    exit 1
+  fi
+else
+  exit 1
+fi
+
+if [ "${SCRIPT_DEBUG}" = 'true' ]; then
+  echo 'Script debugging is enabled, allowing bash commands and their arguments to be printed as they are executed.'
+  set -x
+fi
+
+# Notes:
+#   - https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
+#   - https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html
+#   - https://en.wikipedia.org/wiki/Umask
+#
+BASH_COMPAT=44
+export BASH_COMPAT
+set -e -o pipefail
+shopt -s dotglob extglob
+umask "${UMASK:-0007}"
+
+### BASH BASE [V2] END ###
+
+readonly WINDOW_NAME=default
+
+# shellcheck source=functions.conf
+. "$(dirname "${0}")"/functions.conf
+
+# _help
+# _tmux
+
+_help() {
+  local exit_code
+  exit_code="${1:-1}"
+  cat << EOT
+
+  Usage: $(basename "${0}") [OPTION...] <SESSION NAME> user@host{1..3} anotherUser@anotherHost{1..3}
+
+  Help options:
+    -H Show this help message
+    -U Display brief usage
+    -V Print version
+
+EOT
+  exit "${exit_code}"
+}
+
+_tmux() {
+  local args
+  local hosts
+  local session_name
+  local window_name_number
+  # shellcheck disable=SC2206
+  args=( ${@:2} )
+  hosts=()
+  session_name="${1:?}"
+  window_name_number=1
+  if tmux has-session -t "${session_name}" 2> /dev/null; then
+    _exit 1 "session name already exists, exiting."
+  else
+    tmux new -d -n "${WINDOW_NAME}${window_name_number}" -s "${session_name}" "ssh ${args[0]}"
+  fi
+  unset 'args[0]'
+  for i in "${args[@]}"; do
+    hosts+=( "${i:?}" )
+    if [ "${#hosts[@]}" -le 2 ]; then
+      tmux split-window -t :"${WINDOW_NAME}${window_name_number}" "ssh ${i:?}"
+      tmux select-layout even-vertical
+    elif [ "${#hosts[@]}" -le 8 ]; then
+      tmux split-window -t :"${WINDOW_NAME}${window_name_number}" "ssh ${i:?}"
+      tmux select-layout tiled
+    else
+      hosts=()
+      window_name_number=$(( window_name_number + 1 ))
+      tmux new-window -n "${WINDOW_NAME}${window_name_number}" -t "${session_name}" "ssh ${i:?}"
+      tmux select-layout even-vertical
+    fi
+    tmux select-pane -t :.+
+    tmux set-window-option -t :"${WINDOW_NAME}${window_name_number}" synchronize-panes on
+  done
+}
+
+trap '_catch_all ${?}' ERR SIGHUP SIGINT SIGQUIT SIGTERM
+
+[ $# -ge 2 ] || _help 1
+
+OPTIND=1
+while getopts 'HUV' ARGS; do
+  case "${ARGS}" in
+    H|U)
+      _help 0
+      ;;
+    V)
+      _exit 0 'v3'
+      ;;
+    ?)
+      _help 1
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+_tmux "${@}"
+
+tmux select-window -t "${1:?}":"${WINDOW_NAME}"1
+tmux attach-session -t "${1:?}"
+
+_exit 0

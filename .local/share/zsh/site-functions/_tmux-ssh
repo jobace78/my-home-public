@@ -1,0 +1,10 @@
+#compdef _tmux-ssh tmux-ssh
+
+function _tmux-ssh {
+  local line
+  _arguments -C \
+  "-H[Show this help message]" \
+  "-U[Display brief usage]" \
+  "-V[Print version]" \
+  "*::arg:->args"
+}

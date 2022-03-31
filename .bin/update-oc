@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+
+### BASH BASE [V2] BEGIN ###
+
+if [ -n "${BASH_VERSINFO[*]}" ]; then
+  if [ "${BASH_VERSINFO[0]}" -ge 4 ] && [ "${BASH_VERSINFO[1]}" -ge 4 ]; then
+    :
+  elif [ "${BASH_VERSINFO[0]}" -ge 5 ]; then
+    :
+  else
+    exit 1
+  fi
+else
+  exit 1
+fi
+
+if [ "${SCRIPT_DEBUG}" = 'true' ]; then
+  echo 'Script debugging is enabled, allowing bash commands and their arguments to be printed as they are executed.'
+  set -x
+fi
+
+# Notes:
+#   - https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
+#   - https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html
+#   - https://en.wikipedia.org/wiki/Umask
+#
+BASH_COMPAT=44
+export BASH_COMPAT
+set -e -o pipefail
+shopt -s dotglob extglob
+umask "${UMASK:-0007}"
+
+### BASH BASE [V2] END ###
+
+case "$(uname)" in
+  Darwin*)
+    ;;
+  *)
+    echo 'Sorry, only macOS is supported at this moment...'
+    exit 1
+    ;;
+esac
+
+# Notes:
+#   - https://mirror.openshift.com/pub/openshift-v4/clients/ocp/
+#
+
+# shellcheck source=functions.conf
+. "$(dirname "${0}")"/functions.conf
+
+# _download_and_install
+# _help
+
+_download_and_install() {
+  case "$(uname -m)" in
+    arm64|x86_64)
+      # shellcheck disable=SC2086
+      curl ${CURL_OPTIONS} https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-mac.tar.gz 2> /dev/null \
+      | tar fxz - --directory "${HOME:?}"/.bin oc
+      ;;
+    *)
+      _exit 1 'unsupported machine hardware, exiting.'
+      ;;
+  esac
+}
+
+_help() {
+  local exit_code
+  exit_code="${1:-1}"
+  cat << EOT
+
+  Usage: $(basename "${0}") [OPTION...]
+
+  Help options:
+    -H Show this help message
+    -U Display brief usage
+    -V Print version
+
+EOT
+  exit "${exit_code}"
+}
+
+trap '_catch_all ${?}' ERR SIGHUP SIGINT SIGQUIT SIGTERM
+
+OPTIND=1
+while getopts 'HUV' ARGS; do
+  case "${ARGS}" in
+    H|U)
+      _help 0
+      ;;
+    V)
+      _exit 0 'v3'
+      ;;
+    ?)
+      _help 1
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+
+if [ -f "${HOME:?}"/.bin/oc ]; then
+  if [ "${1}" = "-f" ]; then
+    rm -f -v "${HOME:?}"/.bin/oc
+    _download_and_install
+  fi
+else
+  _download_and_install
+fi
+# completion
+#
+rm -f "${HOME:?}"/.local/share/zsh/site-functions/_oc
+if [ -x "${HOME:?}"/.bin/oc ]; then
+  {
+    echo '#compdef kubectl oc'
+    echo '__kubectl_debug() { : }'
+    "${HOME:?}"/.bin/oc completion zsh | sed -e '/#compdef .*/d'
+  } >> "${HOME:?}"/.local/share/zsh/site-functions/_oc
+fi
+
+_exit 0
