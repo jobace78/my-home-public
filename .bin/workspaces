@@ -50,9 +50,11 @@ id=0
 # _help
 # _print_code_workspace_begin
 # _print_code_workspace_end
+# _print_disabled_plugins_txt
 # _print_git_hooks_commit_msg
 # _print_git_hooks_prepare_commit_msg
 # _print_gitignore
+# _print_idea_properties
 # _print_iml
 # _print_misc_xml_begin
 # _print_misc_xml_end
@@ -110,6 +112,24 @@ _print_code_workspace_end() {
   ],
   "settings": {}
 }
+EOT
+}
+
+_print_disabled_plugins_txt() {
+  # INFO : local variables
+  local path
+  path="${1:?}"
+  [ -d "$(dirname "${path}")" ] || mkdir -p "$(dirname "${path}")"
+  cat << 'EOT' > "${path}"
+DevKit
+com.android.tools.idea.smali
+com.intellij.CloudConfig
+com.intellij.uiDesigner
+com.jetbrains.gateway
+com.jetbrains.settingsSync
+intellij.ktor
+org.jetbrains.android
+org.jetbrains.settingsRepository
 EOT
 }
 
@@ -182,6 +202,16 @@ _print_gitignore() {
   [ -d "$(dirname "${path}")" ] || mkdir -p "$(dirname "${path}")"
   cat << 'EOT' > "${path}"
 *
+EOT
+}
+
+_print_idea_properties() {
+  # INFO : local variables
+  local path
+  path="${1:?}"
+  [ -d "$(dirname "${path}")" ] || mkdir -p "$(dirname "${path}")"
+  cat << 'EOT' > "${path}"
+project.tree.structure.show.url=false
 EOT
 }
 
@@ -432,9 +462,13 @@ for base in "${bases[@]}"; do
     echo "idea   [${base}/workspaces/${workspace_name:?}]..."
     # library
     #
-    for version in "${HOME:?}"/Library/Application\ Support/JetBrains/IntelliJIdea*/workspace; do
-      _print_xml "${version}"/"$(printf "${id:?}%.0s" {1..27})".xml
-    done
+    if ls "${HOME:?}"/Library/Application\ Support/JetBrains/IntelliJIdea* 1> /dev/null 2> /dev/null; then
+      for version in "${HOME:?}"/Library/Application\ Support/JetBrains/IntelliJIdea*; do
+        [ ! -f "${version}"/disabled_plugins.txt.lock ] && _print_disabled_plugins_txt "${version}"/disabled_plugins.txt
+        [ ! -f "${version}"/idea.properties.lock ] && _print_idea_properties "${version}"/idea.properties
+        _print_xml "${version}"/workspace/"$(printf "${id:?}%.0s" {1..27})".xml
+      done
+    fi
     # repos
     #
     for repo in "${repos[@]}"; do
@@ -456,6 +490,7 @@ for base in "${bases[@]}"; do
     rm -rf "${base}"/workspaces/"${workspace_name:?}"/.idea/markdown.xml
     rm -rf "${base}"/workspaces/"${workspace_name:?}"/.idea/modules
     rm -rf "${base}"/workspaces/"${workspace_name:?}"/.idea/python-terminal.xml
+    mkdir -p "${base}"/workspaces/"${workspace_name:?}"/.idea
     if [ ! -d "${base}"/workspaces/"${workspace_name:?}"/dataSources.nosync ] || [ ! -L "${base}"/workspaces/"${workspace_name:?}"/.idea/dataSources ]; then
       rm -rf "${base}"/workspaces/"${workspace_name:?}"/.idea/dataSources
       mkdir -p "${base}"/workspaces/"${workspace_name:?}"/dataSources.nosync

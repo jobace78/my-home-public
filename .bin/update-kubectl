@@ -78,6 +78,9 @@ _help() {
 
   Usage: $(basename "${0}") [OPTION...]
 
+  Options:
+    -f Force
+
   Help options:
     -H Show this help message
     -U Display brief usage
@@ -90,8 +93,11 @@ EOT
 trap '_catch_all ${?}' ERR SIGHUP SIGINT SIGQUIT SIGTERM
 
 OPTIND=1
-while getopts 'HUV' ARGS; do
+while getopts 'fHUV' ARGS; do
   case "${ARGS}" in
+    f)
+      force='true'
+      ;;
     H|U)
       _help 0
       ;;
@@ -106,7 +112,7 @@ done
 shift $(( OPTIND - 1 ))
 
 if [ -f "${HOME:?}"/.bin/kubectl ]; then
-  if [ "${1}" = "-f" ]; then
+  if [ "${force}" = 'true' ]; then
     rm -f -v "${HOME:?}"/.bin/kubectl
     _download_and_install
   fi
