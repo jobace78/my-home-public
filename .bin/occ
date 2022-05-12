@@ -46,7 +46,6 @@ _help() {
 
   Options:
     -n <namespace>       Set the specified namespace, defaults to 'default'
-    -s <service account> Set the specified service account
     -t <token>           Set the specified token
     -u                   Unset current-context and exit
 
@@ -88,17 +87,10 @@ if oc config current-context 1> /dev/null 2> /dev/null; then
 fi
 
 OPTIND=1
-while getopts 'n:s:t:uHUV' ARGS; do
+while getopts 'n:t:uHUV' ARGS; do
   case "${ARGS}" in
     n)
       namespace="${OPTARG}"
-      ;;
-    s)
-      if [ "$(echo "${OPTARG}"|tr -c -d ':'|wc -c)" -eq 3 ]; then
-        service_account="${OPTARG}"
-      else
-        _exit 1 "service account format is 'system:serviceaccount:<namespace>:<name>', exiting."
-      fi
       ;;
     t)
       token="${OPTARG}"
