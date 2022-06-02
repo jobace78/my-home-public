@@ -85,6 +85,10 @@ if [ -s "${NVM_DIR:=${HOME:?}/.nvm}"/nvm.sh ]; then
   . "${NVM_DIR}"/nvm.sh
 fi
 
+if [ -s "${PERLBREW_ROOT:=${HOME:?}/.perlbrew}"/etc/bashrc ]; then
+  . "${PERLBREW_ROOT}"/etc/bashrc
+fi
+
 if [ "${commands[pyenv]}" ]; then
   eval "$(pyenv init -)"
 fi
