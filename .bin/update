@@ -90,8 +90,8 @@ _update() {
   # _docker
   #
   rm -f "${HOME:?}"/.local/share/zsh/site-functions/_docker
-  if [ -f /Applications/Docker.app/Contents/Resources/etc/docker.zsh-completion ]; then
-    ln -s -v /Applications/Docker.app/Contents/Resources/etc/docker.zsh-completion "${HOME:?}"/.local/share/zsh/site-functions/_docker
+  if [ -f /Applications/Docker.app/Contents/Resources/etc/_docker ]; then
+    ln -s -v /Applications/Docker.app/Contents/Resources/etc/_docker "${HOME:?}"/.local/share/zsh/site-functions/_docker
   fi
   # _docker-compose
   #
