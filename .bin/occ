@@ -1,41 +1,9 @@
 #!/usr/bin/env bash
 
-### BASH BASE [V2] BEGIN ###
-
-if [ -n "${BASH_VERSINFO[*]}" ]; then
-  if [ "${BASH_VERSINFO[0]}" -ge 4 ] && [ "${BASH_VERSINFO[1]}" -ge 4 ]; then
-    :
-  elif [ "${BASH_VERSINFO[0]}" -ge 5 ]; then
-    :
-  else
-    exit 1
-  fi
-else
-  exit 1
-fi
-
-if [ "${SCRIPT_DEBUG}" = 'true' ]; then
-  echo 'Script debugging is enabled, allowing bash commands and their arguments to be printed as they are executed.'
-  set -x
-fi
-
-# Notes:
-#   - https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
-#   - https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html
-#   - https://en.wikipedia.org/wiki/Umask
-#
-BASH_COMPAT=44
-export BASH_COMPAT
-set -e -o pipefail
-shopt -s dotglob extglob
-umask "${UMASK:-0007}"
-
-### BASH BASE [V2] END ###
-
+# shellcheck source=bash44.conf
+. "$(dirname "${0}")"/bash44.conf || exit 1
 # shellcheck source=functions.conf
 . "$(dirname "${0}")"/functions.conf
-
-# _help
 
 _help() {
   local exit_code
@@ -76,8 +44,7 @@ if [ -f "${HOME:?}"/."$(basename "${0}")".conf ]; then
     eval "${key}=\${value}"
   done < <(grep -E -v '^\s*\#|^\s*$' "${HOME:?}"/."$(basename "${0}")".conf)
 else
-  echo "'${HOME:?}/.$(basename "${0}").conf' was NOT found..."
-  _help 1
+  _exit 1 "'${HOME:?}/.$(basename "${0}").conf' was NOT found, exiting."
 fi
 
 # save current context for further reference
@@ -132,18 +99,18 @@ oc config set-cluster "${!current_context_name}" \
 --server="${!current_context_server}" 1> /dev/null
 # set-context
 #
-oc config set-context "${!current_context_name}/${service_account:-${!current_context_user}}" \
+oc config set-context "${!current_context_name}/${!current_context_user}" \
 --cluster="${!current_context_name}" \
 --namespace="${namespace:-default}" \
---user="${service_account:-${!current_context_user}}-at-${!current_context_name}" 1> /dev/null
+--user="${!current_context_user}-at-${!current_context_name}" 1> /dev/null
 # set-credentials
 #
 if [ -n "${token}" ]; then
-  oc config set-credentials "${service_account:-${!current_context_user}}-at-${!current_context_name}" \
+  oc config set-credentials "${!current_context_user}-at-${!current_context_name}" \
   --token="${token}" 1> /dev/null
 fi
 # use-context
 #
-oc config use-context "${!current_context_name}/${service_account:-${!current_context_user}}"
+oc config use-context "${!current_context_name}/${!current_context_user}"
 
 _exit 0

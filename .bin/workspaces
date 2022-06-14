@@ -1,70 +1,42 @@
 #!/usr/bin/env bash
 
-### BASH BASE [V2] BEGIN ###
-
-if [ -n "${BASH_VERSINFO[*]}" ]; then
-  if [ "${BASH_VERSINFO[0]}" -ge 4 ] && [ "${BASH_VERSINFO[1]}" -ge 4 ]; then
-    :
-  elif [ "${BASH_VERSINFO[0]}" -ge 5 ]; then
-    :
-  else
-    exit 1
-  fi
-else
-  exit 1
-fi
-
-if [ "${SCRIPT_DEBUG}" = 'true' ]; then
-  echo 'Script debugging is enabled, allowing bash commands and their arguments to be printed as they are executed.'
-  set -x
-fi
-
-# Notes:
-#   - https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
-#   - https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html
-#   - https://en.wikipedia.org/wiki/Umask
-#
-BASH_COMPAT=44
-export BASH_COMPAT
-set -e -o pipefail
-shopt -s dotglob extglob
-umask "${UMASK:-0007}"
-
-### BASH BASE [V2] END ###
+# shellcheck source=bash44.conf
+. "$(dirname "${0}")"/bash44.conf || exit 1
+# shellcheck source=functions.conf
+. "$(dirname "${0}")"/functions.conf
 
 case "$(uname)" in
   Darwin*)
     ;;
   *)
-    echo 'Sorry, only macOS is supported at this moment...'
-    exit 1
+    _exit 1 'Sorry, only macOS is supported at this moment, exiting.'
     ;;
 esac
 
 bases=()
 id=0
 
-# shellcheck source=functions.conf
-. "$(dirname "${0}")"/functions.conf
-
-# _help
-# _print_code_workspace_begin
-# _print_code_workspace_end
-# _print_disabled_plugins_txt
-# _print_git_hooks_commit_msg
-# _print_git_hooks_prepare_commit_msg
-# _print_gitignore
-# _print_idea_properties
-# _print_iml
-# _print_misc_xml_begin
-# _print_misc_xml_end
-# _print_modules_xml_begin
-# _print_modules_xml_end
-# _print_profiles_settings_xml
-# _print_vcs_xml_begin
-# _print_vcs_xml_end
-# _print_workspace_xml
-# _print_xml
+#
+# index:
+#   - _help
+#   - _print_code_workspace_begin
+#   - _print_code_workspace_end
+#   - _print_disabled_plugins_txt
+#   - _print_git_hooks_commit_msg
+#   - _print_git_hooks_prepare_commit_msg
+#   - _print_gitignore
+#   - _print_idea_properties
+#   - _print_iml
+#   - _print_misc_xml_begin
+#   - _print_misc_xml_end
+#   - _print_modules_xml_begin
+#   - _print_modules_xml_end
+#   - _print_profiles_settings_xml
+#   - _print_vcs_xml_begin
+#   - _print_vcs_xml_end
+#   - _print_workspace_xml
+#   - _print_xml
+#
 
 _help() {
   local exit_code
@@ -143,7 +115,7 @@ _print_git_hooks_commit_msg() {
   else
     mkdir -p "${path}"/hooks
     cat << 'EOT' > "${path}"/hooks/commit-msg
-#!/bin/sh
+#!/usr/bin/env bash
 
 EMAIL="$(git config user.email 2> /dev/null)"
 NAME="$(git config user.name 2> /dev/null)"
@@ -176,7 +148,7 @@ _print_git_hooks_prepare_commit_msg() {
   else
     mkdir -p "${path}"/hooks
     cat << 'EOT' > "${path}"/hooks/prepare-commit-msg
-#!/bin/sh
+#!/usr/bin/env bash
 
 case "${2}" in
   commit|merge|squash|template)

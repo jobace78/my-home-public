@@ -1,39 +1,9 @@
 #!/usr/bin/env bash
 
-### BASH BASE [V2] BEGIN ###
-
-if [ -n "${BASH_VERSINFO[*]}" ]; then
-  if [ "${BASH_VERSINFO[0]}" -ge 4 ] && [ "${BASH_VERSINFO[1]}" -ge 4 ]; then
-    :
-  elif [ "${BASH_VERSINFO[0]}" -ge 5 ]; then
-    :
-  else
-    exit 1
-  fi
-else
-  exit 1
-fi
-
-if [ "${SCRIPT_DEBUG}" = 'true' ]; then
-  echo 'Script debugging is enabled, allowing bash commands and their arguments to be printed as they are executed.'
-  set -x
-fi
-
-# Notes:
-#   - https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
-#   - https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html
-#   - https://en.wikipedia.org/wiki/Umask
-#
-BASH_COMPAT=44
-export BASH_COMPAT
-set -e -o pipefail
-shopt -s dotglob extglob
-umask "${UMASK:-0007}"
-
-### BASH BASE [V2] END ###
-
-# _copy
-# _help
+# shellcheck source=.bin/bash44.conf
+. "$(dirname "${0}")"/.bin/bash44.conf || exit 1
+# shellcheck source=.bin/functions.conf
+. "$(dirname "${0}")"/.bin/functions.conf
 
 _copy() {
   # directories (init)
@@ -75,6 +45,8 @@ _help() {
 EOT
   exit "${exit_code}"
 }
+
+trap '_catch_all ${?}' ERR SIGHUP SIGINT SIGQUIT SIGTERM
 
 cd "$(dirname "${0}")" || exit 1
 
