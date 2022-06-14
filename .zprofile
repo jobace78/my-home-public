@@ -10,6 +10,10 @@ if [ -d "${HOME:?}/.bin" ]; then
   PATH="${HOME:?}/.bin${PATH+:${PATH}}"
 fi
 
+if [ -d "${PHPENV_ROOT:=${HOME:?}/.phpenv}/bin" ]; then
+  PATH="${PHPENV_ROOT}/bin${PATH+:${PATH}}"
+fi
+
 if [ -d "${PYENV_ROOT:=${HOME:?}/.pyenv}/bin" ]; then
   PATH="${PYENV_ROOT}/bin${PATH+:${PATH}}"
 fi

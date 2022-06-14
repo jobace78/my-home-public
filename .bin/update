@@ -46,11 +46,11 @@ _update() {
   # _az
   #
   rm -f "${HOME:?}"/.local/share/zsh/site-functions/_az
-  if [ -f "$(brew --prefix 2> /dev/null)"/etc/bash_completion.d/az ]; then
+  if [ -f "${HOMEBREW_ROOT:-"$(brew --prefix 2> /dev/null)"}"/etc/bash_completion.d/az ]; then
     echo "${HOME:?}"/.local/share/zsh/site-functions/_az
     {
       echo '#compdef az'
-      cat "$(brew --prefix 2> /dev/null)"/etc/bash_completion.d/az
+      cat "${HOMEBREW_ROOT:-"$(brew --prefix 2> /dev/null)"}"/etc/bash_completion.d/az
     } >> "${HOME:?}"/.local/share/zsh/site-functions/_az
   fi
   # _docker

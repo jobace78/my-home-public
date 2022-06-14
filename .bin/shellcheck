@@ -17,6 +17,6 @@ esac
 
 # shellcheck disable=SC2048
 # shellcheck disable=SC2086
-"$(brew --prefix 2> /dev/null)"/bin/shellcheck -P SCRIPTDIR -x ${*}
+"${HOMEBREW_ROOT:-"$(brew --prefix 2> /dev/null)"}"/bin/shellcheck -P SCRIPTDIR -x ${*}
 
 # _exit 0

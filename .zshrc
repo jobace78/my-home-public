@@ -15,8 +15,8 @@ alias ls='ls -G'
 # completion
 
 if [ "${commands[brew]}" ]; then
-  if [ -d "$(brew --prefix 2> /dev/null)"/share/zsh/site-functions ]; then
-    fpath+=("$(brew --prefix 2> /dev/null)"/share/zsh/site-functions)
+  if [ -d "${HOMEBREW_ROOT:-"$(brew --prefix 2> /dev/null)"}"/share/zsh/site-functions ]; then
+    fpath+=("${HOMEBREW_ROOT:-"$(brew --prefix 2> /dev/null)"}"/share/zsh/site-functions)
   fi
 fi
 
@@ -87,6 +87,10 @@ fi
 
 if [ -s "${PERLBREW_ROOT:=${HOME:?}/.perlbrew}"/etc/bashrc ]; then
   . "${PERLBREW_ROOT}"/etc/bashrc
+fi
+
+if [ "${commands[phpenv]}" ]; then
+  eval "$(phpenv init -)"
 fi
 
 if [ "${commands[pyenv]}" ]; then
