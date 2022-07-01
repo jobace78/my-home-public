@@ -478,6 +478,11 @@ for base in "${bases[@]}"; do
       mkdir -p "${base}"/workspaces/"${workspace_name:?}"/out.nosync
       ln -s "${base}"/workspaces/"${workspace_name:?}"/out.nosync "${base}"/workspaces/"${workspace_name:?}"/.idea/out
     fi
+    if [ ! -d "${base}"/workspaces/"${workspace_name:?}"/runConfigurations ] || [ ! -L "${base}"/workspaces/"${workspace_name:?}"/.idea/runConfigurations ]; then
+      rm -rf "${base}"/workspaces/"${workspace_name:?}"/.idea/runConfigurations
+      mkdir -p "${base}"/workspaces/"${workspace_name:?}"/runConfigurations
+      ln -s "${base}"/workspaces/"${workspace_name:?}"/runConfigurations "${base}"/workspaces/"${workspace_name:?}"/.idea/runConfigurations
+    fi
     if [ ! -d "${base}"/workspaces/"${workspace_name:?}"/shelf.nosync ] || [ ! -L "${base}"/workspaces/"${workspace_name:?}"/.idea/shelf ]; then
       rm -rf "${base}"/workspaces/"${workspace_name:?}"/.idea/shelf
       mkdir -p "${base}"/workspaces/"${workspace_name:?}"/shelf.nosync
