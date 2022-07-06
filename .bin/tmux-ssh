@@ -29,7 +29,7 @@ _tmux() {
   local session_name
   local window_name_number
   # shellcheck disable=SC2206
-  args=( ${@:2} )
+  args=(${@:2})
   hosts=()
   session_name="${1:?}"
   window_name_number=1
@@ -40,7 +40,7 @@ _tmux() {
   fi
   unset 'args[0]'
   for i in "${args[@]}"; do
-    hosts+=( "${i:?}" )
+    hosts+=("${i:?}")
     if [ "${#hosts[@]}" -le 2 ]; then
       tmux split-window -t :"${WINDOW_NAME}${window_name_number}" "ssh ${i:?}"
       tmux select-layout even-vertical
@@ -49,7 +49,7 @@ _tmux() {
       tmux select-layout tiled
     else
       hosts=()
-      window_name_number=$(( window_name_number + 1 ))
+      window_name_number=$((window_name_number + 1))
       tmux new-window -n "${WINDOW_NAME}${window_name_number}" -t "${session_name}" "ssh ${i:?}"
       tmux select-layout even-vertical
     fi
@@ -65,7 +65,7 @@ trap '_catch_all ${?}' ERR SIGHUP SIGINT SIGQUIT SIGTERM
 OPTIND=1
 while getopts 'HUV' ARGS; do
   case "${ARGS}" in
-    H|U)
+    H | U)
       _help 0
       ;;
     V)
@@ -76,11 +76,9 @@ while getopts 'HUV' ARGS; do
       ;;
   esac
 done
-shift $(( OPTIND - 1 ))
+shift $((OPTIND - 1))
 
 _tmux "${@}"
 
 tmux select-window -t "${1:?}":"${WINDOW_NAME}"1
 tmux attach-session -t "${1:?}"
-
-_exit 0

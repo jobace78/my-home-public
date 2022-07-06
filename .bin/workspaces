@@ -6,8 +6,7 @@
 . "$(dirname "${0}")"/functions.conf
 
 case "$(uname)" in
-  Darwin*)
-    ;;
+  Darwin*) ;;
   *)
     _exit 1 'Sorry, only macOS is supported at this moment, exiting.'
     ;;
@@ -395,7 +394,7 @@ fi
 OPTIND=1
 while getopts 'HUV' ARGS; do
   case "${ARGS}" in
-    H|U)
+    H | U)
       _help 0
       ;;
     V)
@@ -406,10 +405,10 @@ while getopts 'HUV' ARGS; do
       ;;
   esac
 done
-shift $(( OPTIND - 1 ))
+shift $((OPTIND - 1))
 
 for base in "${bases[@]}"; do
-  id=$(( id + 1 ))
+  id=$((id + 1))
   repos=()
   workspace_name="${base##*/}"
   #########
@@ -499,7 +498,7 @@ for base in "${bases[@]}"; do
     for repo in "${repos[@]}"; do
       if [ -f "${repo}"/pom.xml ]; then
         echo "        <option value=\"\$PROJECT_DIR\$/../../repos/${repo##*/}/pom.xml\" />" \
-        >> "${base}"/workspaces/"${workspace_name:?}"/.idea/misc.xml
+          >> "${base}"/workspaces/"${workspace_name:?}"/.idea/misc.xml
       fi
     done
     _print_misc_xml_end "${base}"/workspaces/"${workspace_name:?}"/.idea/misc.xml
@@ -510,7 +509,7 @@ for base in "${bases[@]}"; do
       # shellcheck disable=SC2207
       repo_iml=($(find "${base}"/repos/"${repo##*/}" -maxdepth 1 -name "*.iml" -type f 2> /dev/null))
       echo "      <module fileurl=\"file://\$PROJECT_DIR\$/../../repos/${repo##*/}/${repo_iml[0]##*/}\" filepath=\"\$PROJECT_DIR\$/../../repos/${repo##*/}/${repo_iml[0]##*/}\" />" \
-      >> "${base}"/workspaces/"${workspace_name:?}"/.idea/modules.xml
+        >> "${base}"/workspaces/"${workspace_name:?}"/.idea/modules.xml
     done
     _print_modules_xml_end "${base}"/workspaces/"${workspace_name:?}"/.idea/modules.xml
     # workspace (.idea/python-terminal.xml)
@@ -521,7 +520,7 @@ for base in "${bases[@]}"; do
     _print_vcs_xml_begin "${base}"/workspaces/"${workspace_name:?}"/.idea/vcs.xml
     for repo in "${repos[@]}"; do
       echo "    <mapping directory=\"\$PROJECT_DIR\$/../../repos/${repo##*/}\" vcs=\"Git\" />" \
-      >> "${base}"/workspaces/"${workspace_name:?}"/.idea/vcs.xml
+        >> "${base}"/workspaces/"${workspace_name:?}"/.idea/vcs.xml
     done
     _print_vcs_xml_end "${base}"/workspaces/"${workspace_name:?}"/.idea/vcs.xml
     # workspace (.idea/workspace.xml)
@@ -538,19 +537,17 @@ for base in "${bases[@]}"; do
     _print_code_workspace_begin "${base}"/workspaces/"${workspace_name:?}".code-workspace
     for repo in "${repos[@]::${#repos[@]}-1}"; do
       echo "    { \"path\": \"../repos/${repo##*/}\" }," \
-      >> "${base}"/workspaces/"${workspace_name:?}".code-workspace
+        >> "${base}"/workspaces/"${workspace_name:?}".code-workspace
     done
     for repo in ${repos[-1]}; do
       echo "    { \"path\": \"../repos/${repo##*/}\" }" \
-      >> "${base}"/workspaces/"${workspace_name:?}".code-workspace
+        >> "${base}"/workspaces/"${workspace_name:?}".code-workspace
     done
     if [ -f "${base}"/workspaces/"${workspace_name:?}".code-workspace.custom-settings ]; then
       cat "${base}"/workspaces/"${workspace_name:?}".code-workspace.custom-settings \
-      >> "${base}"/workspaces/"${workspace_name:?}".code-workspace
+        >> "${base}"/workspaces/"${workspace_name:?}".code-workspace
     else
       _print_code_workspace_end "${base}"/workspaces/"${workspace_name:?}".code-workspace
     fi
   fi
 done
-
-_exit 0

@@ -17,16 +17,16 @@ _copy() {
   # files
   #
   find . \
-  -maxdepth 1 \
-  -not -path "*.iml" \
-  -not -path "./.editorconfig" \
-  -not -path "./.git" \
-  -not -path "./.gitignore" \
-  -not -path "./LICENSE" \
-  -not -path "./README.md" \
-  -not -path "./copy-and-update.sh" \
-  -type f \
-  | sort | xargs -I {} -n 1 cp -f -p -v {} "${HOME:?}"
+    -maxdepth 1 \
+    -not -path "*.iml" \
+    -not -path "./.editorconfig" \
+    -not -path "./.git" \
+    -not -path "./.gitignore" \
+    -not -path "./LICENSE" \
+    -not -path "./README.md" \
+    -not -path "./copy-and-update.sh" \
+    -type f |
+    sort | xargs -I {} -n 1 cp -f -p -v {} "${HOME:?}"
 }
 
 _help() {
@@ -53,7 +53,7 @@ cd "$(dirname "${0}")" || exit 1
 OPTIND=1
 while getopts 'HUV' ARGS; do
   case "${ARGS}" in
-    H|U)
+    H | U)
       _help 0
       ;;
     V)
@@ -64,7 +64,7 @@ while getopts 'HUV' ARGS; do
       ;;
   esac
 done
-shift $(( OPTIND - 1 ))
+shift $((OPTIND - 1))
 
 _copy
 

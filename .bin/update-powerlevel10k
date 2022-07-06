@@ -6,8 +6,7 @@
 . "$(dirname "${0}")"/functions.conf
 
 case "$(uname)" in
-  Darwin*)
-    ;;
+  Darwin*) ;;
   *)
     _exit 1 'Sorry, only macOS is supported at this moment, exiting.'
     ;;
@@ -20,8 +19,8 @@ _download_and_install() {
   git clone --depth 1 https://github.com/romkatv/powerlevel10k.git --quiet "${HOME:?}"/.powerlevel10k
   pushd "${HOME:?}"/.powerlevel10k
   # shellcheck disable=SC2038
-  find config -name "*.zsh" -type f 2> /dev/null \
-  | xargs sed -i '' 's/branch > 32/branch > 64/g'
+  find config -name "*.zsh" -type f 2> /dev/null |
+    xargs sed -i '' 's/branch > 32/branch > 64/g'
   git gc --quiet
   popd
 }
@@ -53,7 +52,7 @@ while getopts 'fHUV' ARGS; do
     f)
       force='true'
       ;;
-    H|U)
+    H | U)
       _help 0
       ;;
     V)
@@ -64,7 +63,7 @@ while getopts 'fHUV' ARGS; do
       ;;
   esac
 done
-shift $(( OPTIND - 1 ))
+shift $((OPTIND - 1))
 
 if [ -d "${HOME:?}"/.powerlevel10k ]; then
   if [ "${force}" = 'true' ]; then
@@ -74,5 +73,3 @@ if [ -d "${HOME:?}"/.powerlevel10k ]; then
 else
   _download_and_install
 fi
-
-_exit 0

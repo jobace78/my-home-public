@@ -6,8 +6,7 @@
 . "$(dirname "${0}")"/functions.conf
 
 case "$(uname)" in
-  Darwin*)
-    ;;
+  Darwin*) ;;
   *)
     _exit 1 'Sorry, only macOS is supported at this moment, exiting.'
     ;;
@@ -20,13 +19,13 @@ _download_and_install() {
   case "$(uname -m)" in
     arm64)
       # shellcheck disable=SC2086
-      curl ${CURL_OPTIONS} https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-mac-arm64.tar.gz 2> /dev/null \
-      | tar fxz - --directory "${HOME:?}"/.bin oc && codesign --sign '-' "${HOME:?}"/.bin/oc
+      curl ${CURL_OPTIONS} https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-mac-arm64.tar.gz 2> /dev/null |
+        tar fxz - --directory "${HOME:?}"/.bin oc && codesign --sign '-' "${HOME:?}"/.bin/oc
       ;;
     x86_64)
       # shellcheck disable=SC2086
-      curl ${CURL_OPTIONS} https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-mac.tar.gz 2> /dev/null \
-      | tar fxz - --directory "${HOME:?}"/.bin oc
+      curl ${CURL_OPTIONS} https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-mac.tar.gz 2> /dev/null |
+        tar fxz - --directory "${HOME:?}"/.bin oc
       ;;
     *)
       _exit 1 'unsupported machine hardware, exiting.'
@@ -61,7 +60,7 @@ while getopts 'fHUV' ARGS; do
     f)
       force='true'
       ;;
-    H|U)
+    H | U)
       _help 0
       ;;
     V)
@@ -72,7 +71,7 @@ while getopts 'fHUV' ARGS; do
       ;;
   esac
 done
-shift $(( OPTIND - 1 ))
+shift $((OPTIND - 1))
 
 if [ -f "${HOME:?}"/.bin/oc ]; then
   if [ "${force}" = 'true' ]; then
@@ -92,5 +91,3 @@ if [ -x "${HOME:?}"/.bin/oc ]; then
     "${HOME:?}"/.bin/oc completion zsh | sed -e '/#compdef .*/d'
   } >> "${HOME:?}"/.local/share/zsh/site-functions/_oc
 fi
-
-_exit 0

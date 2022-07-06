@@ -26,7 +26,7 @@ trap '_catch_all ${?}' ERR SIGHUP SIGINT SIGQUIT SIGTERM
 OPTIND=1
 while getopts 'HUV' ARGS; do
   case "${ARGS}" in
-    H|U)
+    H | U)
       _help 0
       ;;
     V)
@@ -37,7 +37,7 @@ while getopts 'HUV' ARGS; do
       ;;
   esac
 done
-shift $(( OPTIND - 1 ))
+shift $((OPTIND - 1))
 
 [ $# -ge 1 ] || _help 1
 
@@ -46,5 +46,3 @@ if [ -r "${1:?}" ]; then
 else
   _exit 1 "'${1:?}' was NOT readable, exiting."
 fi
-
-_exit 0

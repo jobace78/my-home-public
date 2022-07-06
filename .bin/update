@@ -6,8 +6,7 @@
 . "$(dirname "${0}")"/functions.conf
 
 case "$(uname)" in
-  Darwin*)
-    ;;
+  Darwin*) ;;
   *)
     _exit 1 'Sorry, only macOS is supported at this moment, exiting.'
     ;;
@@ -94,7 +93,7 @@ while getopts 'fHUV' ARGS; do
     f)
       force='true'
       ;;
-    H|U)
+    H | U)
       _help 0
       ;;
     V)
@@ -105,8 +104,6 @@ while getopts 'fHUV' ARGS; do
       ;;
   esac
 done
-shift $(( OPTIND - 1 ))
+shift $((OPTIND - 1))
 
 _update
-
-_exit 0

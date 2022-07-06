@@ -70,7 +70,7 @@ while getopts 'n:t:uHUV' ARGS; do
       fi
       _exit 0
       ;;
-    H|U)
+    H | U)
       _help 0
       ;;
     V)
@@ -81,7 +81,7 @@ while getopts 'n:t:uHUV' ARGS; do
       ;;
   esac
 done
-shift $(( OPTIND - 1 ))
+shift $((OPTIND - 1))
 
 [ $# -ge 1 ] || _help 1
 
@@ -96,21 +96,19 @@ current_context_user="${1:?}_user"
 # set-cluster
 #
 oc config set-cluster "${!current_context_name}" \
---server="${!current_context_server}" 1> /dev/null
+  --server="${!current_context_server}" 1> /dev/null
 # set-context
 #
 oc config set-context "${!current_context_name}/${!current_context_user}" \
---cluster="${!current_context_name}" \
---namespace="${namespace:-default}" \
---user="${!current_context_user}-at-${!current_context_name}" 1> /dev/null
+  --cluster="${!current_context_name}" \
+  --namespace="${namespace:-default}" \
+  --user="${!current_context_user}-at-${!current_context_name}" 1> /dev/null
 # set-credentials
 #
 if [ -n "${token}" ]; then
   oc config set-credentials "${!current_context_user}-at-${!current_context_name}" \
-  --token="${token}" 1> /dev/null
+    --token="${token}" 1> /dev/null
 fi
 # use-context
 #
 oc config use-context "${!current_context_name}/${!current_context_user}"
-
-_exit 0
