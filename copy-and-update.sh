@@ -2,6 +2,8 @@
 
 # shellcheck source=.bin/bash44.conf
 . "$(dirname "${0}")"/.bin/bash44.conf || exit 1
+# shellcheck source=.bin/constants.conf
+. "$(dirname "${0}")"/.bin/constants.conf
 # shellcheck source=.bin/functions.conf
 . "$(dirname "${0}")"/.bin/functions.conf
 
