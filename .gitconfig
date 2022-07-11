@@ -6,15 +6,8 @@
   l = log --graph
   la = log --all --graph
   s = ! "git log|awk '$1~/git-subtree-dir/{print $2}'"
-[commit]
-  gpgsign = true
 [core]
   abbrev = 7
-# [filter "lfs"]
-  # clean = git-lfs clean -- %f
-  # process = git-lfs filter-process
-  # required = true
-  # smudge = git-lfs smudge -- %f
 [include]
   path = ~/.gitconfig.inc
 [log]
