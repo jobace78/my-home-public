@@ -16,6 +16,12 @@ esac
 
 # trap '_catch_all ${?}' ERR SIGHUP SIGINT SIGQUIT SIGTERM
 
-# shellcheck disable=SC2048
-# shellcheck disable=SC2086
-"${HOMEBREW_ROOT:-"$(brew --prefix 2> /dev/null)"}"/bin/shellcheck --exclude=SC1091 --external-sources --source-path=SCRIPTDIR ${*}
+if [[ "${*}" =~ '--exclude' ]]; then
+  # shellcheck disable=SC2048
+  # shellcheck disable=SC2086
+  "${HOMEBREW_ROOT:-"$(brew --prefix 2> /dev/null)"}"/bin/shellcheck --external-sources --source-path=SCRIPTDIR ${*}
+else
+  # shellcheck disable=SC2048
+  # shellcheck disable=SC2086
+  "${HOMEBREW_ROOT:-"$(brew --prefix 2> /dev/null)"}"/bin/shellcheck --exclude=SC1091 --external-sources --source-path=SCRIPTDIR ${*}
+fi

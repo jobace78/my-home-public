@@ -23,7 +23,6 @@ id=0
 #   - _print_code_workspace_begin
 #   - _print_code_workspace_end
 #   - _print_disabled_plugins_txt
-#   - _print_git_hooks_commit_msg
 #   - _print_git_hooks_prepare_commit_msg
 #   - _print_gitignore
 #   - _print_idea_properties
