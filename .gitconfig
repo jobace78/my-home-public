@@ -10,6 +10,8 @@
   abbrev = 7
 [include]
   path = ~/.gitconfig.inc
+[init]
+  defaultBranch = master
 [log]
   abbrevcommit = yes
 [pull]
